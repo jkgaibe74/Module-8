@@ -1,0 +1,40 @@
+#load library
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(maps)
+library(RColorBrewer)
+
+#load data
+weather.df <- read.csv("data/Weather.csv")
+weather.df <- na.omit(weather.df)
+str(weather.df)
+
+#visualiztion 1
+#converting date variable to date class
+weather.df$date <- as.Date(weather.df$date)
+
+# Plot temperature changes over time for each city with facet_wrap()
+ggplot(weather.df, aes(x = date, y = avg_temp, color = city)) +
+  geom_line() +
+  labs(x = "Date", y = "Average Temperature") +
+  theme_minimal() +
+  facet_wrap(~ city, scales = "free_y", ncol = 1)
+
+#visualization 2
+
+ggplot(weather.df, aes(x = date, y = avg_humidity, fill = avg_temp)) +
+  geom_tile() +
+  facet_wrap( ~ city, ncol = 1) +
+  scale_fill_gradientn(colors = brewer.pal(7, "Reds"))
+
+
+#visualiztion 3: of events
+# filter data showing variables with events only 
+filtered_data <- weather.df %>% filter(!is.na(events) & events != "")
+
+# Plotting the count of events for each city
+ggplot(filtered_data, aes(x = city, fill = events)) +
+  geom_bar() +
+  labs(x = "City", y = "Event Count") +
+  theme_minimal()
